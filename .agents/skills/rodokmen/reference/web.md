@@ -65,11 +65,15 @@ Další aktualizace = jen `npm run nasadit`. Vlastní doménu lze nastavit v adm
 
 **Pozor:** „Netlify Drop“ (přetažení složky v prohlížeči) neumí Edge Functions → web by byl bez přihlášení. Nepoužívat.
 
-## Náhled v Claude desktop
-Projekt má `.claude/launch.json` – náhled webu v Claude desktop spustí `npm --prefix web run dev` (port 4321). Data se
-předtím musí vyexportovat (`cd web && npm run data`). Když náhled nenaběhne (třeba na Windows, kde je `npm` jako `npm.cmd`),
-zkus v `launch.json` `"runtimeExecutable": "node"` a `"runtimeArgs": ["web/node_modules/astro/bin/astro.mjs", "dev", "--root", "web"]`
-(Astro 7 má spouštěč `astro.mjs`, ne `astro.js`). Server běží jen na tomto počítači – nepřidávej `--host`.
+## Náhled webu v OpenAI Codexu (lokální CLI / IDE / aplikace)
+Po založení projektu a kontrole `AGENTS.md` spusť ze složky projektu:
+```bash
+cd web
+npm install
+npm run data
+npm run nahled
+```
+Web bude dostupný na `http://localhost:4321`. Otevři jej v prohlížeči uživatele, případně použij nástroj prohlížeče v Codexu jen pokud je skutečně dostupný. `localhost` v izolovaném cloudovém sandboxu nemusí být dostupný uživateli — tam vytvoř snímek náhledu nebo po schválení publikuj dočasnou neveřejnou verzi. K serveru nepřidávej `--host` bez důvodu; výchozí náhled slouží pouze lokálně. Pokud není `npm` na Windows v PATH, po instalaci restartuj Codex/terminál a zkontroluj `npm.cmd`.
 
 ## Vlastní server (pokročilé)
 - Docker: `web/Dockerfile` (build Astro → nginx s `nginx.conf` z `nginx.sablona.conf`). Před buildem image vždy `npm run data`.

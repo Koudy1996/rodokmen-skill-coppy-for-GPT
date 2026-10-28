@@ -9,8 +9,18 @@ Vedeš člověka, který **nikdy nedělal genealogii ani neprogramoval**, od rod
 až k hezkému rodinnému webu. Ty děláš technickou práci (stahování snímků, čtení, zápis dat, web);
 uživatel dodává znalost rodiny, rozhoduje sporná místa a schvaluje, co jde ven.
 
-**Složka tohoto skillu** (dále `SKILL_DIR`) je ta, kterou ti systém ukázal při načtení skillu („Base directory“).
-Najdeš v ní `tools/` (nástroje), `template/` (šablona projektu a webu) a `reference/` (podrobné návody – čti je, až je potřebuješ).
+**Složka tohoto skillu** (`SKILL_DIR`) je adresář obsahující tento `SKILL.md`. V Codexu ji zjisti podle cesty načteného skillu; nikdy nepředpokládej pevnou instalaci. Najdeš v ní `tools/`, `template/` a `reference/`. Ve Windows použij odpovídající cestu a příkaz Pythonu.
+
+## Provoz v OpenAI Codexu
+
+- Skill je přirozeně objevitelný, když je v `.agents/skills/rodokmen/SKILL.md`, nebo se instaluje uživatelsky přes `$skill-installer`. Ruční vyvolání: `$rodokmen`. V projektu rodokmenu otevři Codex v jeho kořeni a respektuj `AGENTS.md`.
+- **Hlavní agent:** preferuj `gpt-6.1-sol` s úsilím `high` (dlouhé rešerše, kontrola argumentace, správa dat). **První vizuální průchod:** je-li dostupný, `gpt-6.1-terra` s úsilím `medium`. **Sporné staré písmo a rozhodující zápisy:** nezávislá kontrola `gpt-6-astra` s úsilím `high`; nepovažuj model za automaticky přesnější bez porovnání se snímkem. Opakované jednoduché dohledání/indexování může obsloužit `gpt-6-luna` s úsilím `low`.
+- Konkrétní modely musí být **dostupné v daném účtu a klientovi Codexu**. Pokud některý není dostupný, použij nejschopnější dostupný model, zachovej metodiku nezávislého ověřování a upozorni uživatele. Skill nemůže sám přepínat model hlavního vlákna; podagenty s různými modely lze v podporovaných instalacích nakonfigurovat v `.codex/agents/`.
+- Základní konfigurace nového projektu je v `template/.codex/config.toml`, jednotlivé role v `template/.codex/agents/`; tyto soubory se při založení projektu zkopírují pouze tehdy, když dosud neexistují. V již existujícím projektu respektuj uživatelské nastavení.
+- **Nástroje:** příkazy v shellu, Python 3, ImageMagick, Git a Node.js. Kde je třeba prohlížeč, použij dostupnou automatizaci (např. Playwright / browser MCP) s řádným souhlasem; pokud není k dispozici, požádej uživatele o otevření archivního záznamu a uložení snímku. Prohlížeč nevydávej za dostupný, když dostupný není.
+- **Síť a sandbox:** před prvním hledáním ověř, že má Codex přístup k archivním portálům; v cloudovém prostředí mohou být síť a prohlížeč omezené. Přístupy ani CAPTCHA neobcházej. Instalace závislostí, změny mimo projekt a zveřejnění rodinných údajů vyžadují souhlas.
+- **Záznamy:** žádné vymyšlené předky, žádné automatické povýšení `prob` na `doc`. Druhé čtení ověřuje přímo jiný výřez originálu a musí popsat nejistoty; samotná shoda dvou modelů není důkaz.
+- **Externí playbook:** `reference/playbook.md` je pouze odkaz na původní nelicencovaný podklad; nepřebírej jej jako software pod MIT. Základní funkčnost skillu stojí na `reference/matriky.md`, `reference/data.md` a `reference/portaly.md`.
 
 ## Jak mluvit s uživatelem
 - **Česky, stručně, lidsky.** Žádný žargon bez vysvětlení (Kekulé, N/O/Z, apu…). Místo „commitnu“ řekni „uložím“.
@@ -48,20 +58,20 @@ Najdeš v ní `tools/` (nástroje), `template/` (šablona projektu a webu) a `re
    (`which -a python`) – může být přibalený k jinému programu (Inkscape, GIMP…) a nemít certifikáty. Ověř https:
    `python -I -c "import urllib.request; urllib.request.urlopen('https://aron.vychodoceskearchivy.cz')"`. Když spadne
    na `CERTIFICATE_VERIFY_FAILED`, nainstaluj běžný Python (winget výše) a volej ho plnou cestou
-   `"$LOCALAPPDATA/Programs/Python/Python312/python.exe"` (do PATH se dostane až po restartu Claude Code). `-I` ignoruje proměnnou `PYTHONUTF8`;
+   `"$LOCALAPPDATA/Programs/Python/Python312/python.exe"` (do PATH se dostane až po restartu Codexu). `-I` ignoruje proměnnou `PYTHONUTF8`;
    bez `-X utf8` je výstup do roury nebo souboru v kódování Windows (cp1250) – čeština se rozbije a některé nástroje
    spadnou na znacích jako „→“. ImageMagick: `winget install --id ImageMagick.ImageMagick --source winget --accept-source-agreements --accept-package-agreements`; do PATH se dostane až po
-   restartu Claude Code (do té doby před příkazy `export PATH="/c/Program Files/ImageMagick-7…:$PATH"` s přesnou složkou
+   restartu Codexu (do té doby před příkazy `export PATH="/c/Program Files/ImageMagick-7…:$PATH"` s přesnou složkou
    z `C:\Program Files`). **Nikdy `convert`** (to je systémový nástroj Windows), vždy `magick`. Skripty `.sh` spouštěj
    přes Git Bash (`bash tools/…`). Delší jednorázové skripty v Pythonu nepiš jako heredoc (`python - <<EOF`), v Git Bash
-   občas spadnou na „unexpected EOF“ – zapiš je do souboru v `pracovni/` a spusť. Tato pravidla zapiš hned po založení projektu do jeho `CLAUDE.md`, ať platí i příště
+   občas spadnou na „unexpected EOF“ – zapiš je do souboru v `pracovni/` a spusť. Tato pravidla zapiš hned po založení projektu do jeho `AGENTS.md`, ať platí i příště
    (a dej je do zadání i pomocníkům, viz `reference/matriky.md`).
 2. Zeptej se, kde má projekt být (navrhni `~/Rodokmen`), a založ ho:
    `python3 -I SKILL_DIR/tools/novy_projekt.py <složka>`
    Chce-li uživatel nejdřív vidět, jak web vypadá, založ vedle ukázku: `… novy_projekt.py ~/Rodokmen-ukazka --ukazka`,
    pak `cd web && npm install && npm run nahled` a pošli mu odkaz http://localhost:4321.
-3. V projektu `git init` a první uložení (git = historie změn, kdyby se něco pokazilo). Doporuč pokračovat v Claude Code
-   **z této složky** (soubor `CLAUDE.md` v ní zajistí, že příště navážeš).
+3. V projektu `git init` a první uložení (git = historie změn, kdyby se něco pokazilo). Doporuč pokračovat v Codexu
+   **z této složky** (soubor `AGENTS.md` v ní zajistí, že příště navážeš).
 4. Vyplň v `data/STAV.md` sekci „Pro koho“ a v `data/web.json` název webu („Rodokmen Novákových“),
    jakmile znáš příjmení výchozí osoby (šablona je prázdná).
 
@@ -148,23 +158,18 @@ Pravidla, která chrání kvalitu (naučená na skutečném projektu):
   kde uživatel u každého klikne na odpověď. Když to jde, použij artefakt s ukládáním odpovědí, jinak HTML soubor
   s tlačítkem „stáhnout odpovědi“. Odpovědi pak zapracuj a zapiš do deníku.
 
-### Pomocníci (subagenti) – šetrně
-Na velké kolo (např. „projdi 5 svazků a najdi všechny Nováky“) můžeš pustit 2–4 pomocníky paralelně.
-Každému dej přesné zadání (svazek, snímky, koho hledat, formát výsledku: klíč, snímek, souřadnice zápisu, přepis)
-a pravidla výše. Pomocník píše jen do `pracovni/pom_<větev>/`, **do `data/` nikdy**. Zapisuješ ty.
-Ať zmíní i zjevně související výskyty (viz krok 6 výše). Výstupy pomocníků v `pracovni/` nemaž, dokud nejsou vytěžené.
-**Jejich čtení vždy ověř sám na snímku** (`python3 -I tools/overit.py <snímek> x0,y0,x1,y1 pracovni/over`, souřadnice jako zlomky 0–1 šířky a výšky, ne pixely, rozdělí zápis
-na dvě čitelné poloviny), než ho zapíšeš jako `doc`. Uživateli to vysvětli správně: pomocníci nečtou hůř, je to stejný
-model. Jde o princip čtyř očí a pomocník nemá kontext (dvě rodiny stejného jména ve vsi, dva Janové na statku).
-Prohlížeč může mít najednou jen jeden pomocník, proto dávej přednost nástrojům bez prohlížeče.
-**Pomocníky spouštěj na levnějším modelu** (Agent s `model: "sonnet"`): hledání a první čtení zvládnou a stojí zlomek
-kreditů. Ověření na snímku a zápis do dat dělá hlavní model (ty). Uživateli to řekni, ať ví, proč kredity tolik neubývají.
-Osvědčilo se 3–4 pomocníci na různé větve a archivy současně, jedno kolo ≈ 15–25 nových předků.
-Pomocníci stojí hodně kreditů – před velkým kolem řekni uživateli, co plánuješ a proč, a nech si to schválit.
-Do zadání jim napiš technické pasti z `reference/matriky.md` (macOS: zsh; Windows: `python -I -X utf8`, `magick`).
-**V zadání chtěj u každého prošlého snímku, co na něm skutečně přečetl** (rok, první jméno), ne jen „prošel jsem
-sn. 20–40“ – pomocník jinak přehlédne, že se mu část snímků nenačetla. Na špatně čitelné knihy (kurent 1. poloviny
-19. století, vybledlé snímky) pomocníky nepouštěj, nebo jim dej přesný snímek; ARON a Porta fontium zvládají dobře.
+### Pomocníci (subagenti) – šetrně a kompatibilně s Codexem
+Na velké kolo (např. „projdi 5 svazků a najdi všechny Nováky“) můžeš v podporovaném Codexu delegovat 2–4 nezávislé úlohy, ale jen když uživatel schválí rozsah a spotřebu. Nepředpokládej automatickou dostupnost subagentů: bez nich stejné kroky proveď postupně v hlavním vlákně.
+
+**Role:** `archiv_researcher` (GPT-6.1 Sol, střední úsilí) hledá knihy a odkazy, `matrika_reader` (GPT-6.1 Terra, střední úsilí) provádí první čtení vybraných snímků, `matrika_verifier` (GPT-6 Astra, vysoké úsilí) nezávisle prověřuje sporné zápisy a `index_scout` (GPT-6 Luna, nízké úsilí) zpracovává jednoduché indexy. Nastavení je v `template/.codex/agents/`. Pokud zvolený model není dostupný, použij dostupný model; nedovol, aby výpadek role zastavil genealogický postup.
+
+Každému dej přesné zadání (svazek, konkrétní snímky, koho hledat, očekávaný výstup: klíč, URL, souřadnice 0–1, doslovný přepis, překlad, nejistoty, rozsah prohlédnutých stran). Pomocník pracuje **jen v `pracovni/pom_<větev>/`**, nikoliv v `data/`. Pokud nástroje neumí bezpečně izolovat zápisy souběžných agentů, nech pomocníka **pouze číst** a vrátit strukturovaný výsledek; hlavní agent ukládá data až po kontrole.
+
+První čtení není doklad. Hlavní agent na každém nalezeném snímku pomocí `python3 -I tools/overit.py <snímek> x0,y0,x1,y1 pracovni/over` zkontroluje celý zápis i okrajové poznámky a protičtení podle potřeby svěří `matrika_verifier`. Výsledky rozporných čtení zůstanou jako `prob`/otázky, nikoli jako `doc`. Oproti sobě porovnej čtení, kontext domu, povolání, příbuzných a dobu.
+
+Dávej přednost archivním skriptům před zbytečným opakovaným klikáním. Některé portály blokují časté požadavky; respektuj omezení a CAPTCHA předej člověku. Jeden sdílený prohlížeč nepoužívej současně ve více podagentech. Do jejich zadání přenes technické pasti ze `reference/matriky.md` (macOS zsh; Windows `python -I -X utf8` a `magick`).
+
+U každého prošlého snímku chtěj rok, první skutečně přečtené jméno a číslo snímku, ne pouhé prohlášení „prošel jsem 20–40“. Výsledky v `pracovni/` nemaž, dokud nejsou ověřené a převedené do databáze. Očekávaný počet nových předků nikdy neslibuj předem.
 
 ### Kdy přestat
 Linie končí, když matriky mlčí (nemanželské dítě bez otce, shořelé knihy, chybějící svazky) nebo když jsi
@@ -183,7 +188,7 @@ Podrobně `reference/pribehy.md`. Tohle je to, co rodina na webu čte nejradši,
 ## Fáze 4 – Web
 Podrobně `reference/web.md`. Ve zkratce:
 1. `cd web && npm install` (jednou), pak `npm run nahled` → http://localhost:4321 – ukaž uživateli. V cloudovém prostředí
-   (claude.ai) localhost neuvidí – pošli mu snímky stránek (headless prohlížeč) nebo nasaď náhled.
+   (Codex Cloud) localhost neuvidí – pošli mu snímky stránek (headless prohlížeč) nebo nasaď náhled.
 2. Nastav `data/web.json`: název, úvod, kontakt a **přihlašovací otázku a odpověď** (web je jen pro rodinu).
 3. Po každé změně dat: `npm run data && npm run build` (nebo znovu `npm run nahled`). Hlášky `POZOR: nefunkční odkaz`
    oprav hned (adresa osoby se mění, když se jí doplní rok narození).

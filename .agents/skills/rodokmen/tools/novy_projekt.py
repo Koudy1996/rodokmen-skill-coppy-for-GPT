@@ -5,8 +5,8 @@ Použití: python3 <skill>/tools/novy_projekt.py <cílová složka> [--ukazka]
   --ukazka   nakopíruje i vymyšlená ukázková data (rodina Novákových), aby šel web hned vyzkoušet
 
 Vytvoří: data/ (prázdné kostry nebo ukázka), web/ (Astro web), tools/ (kopie nástrojů),
-vyrezy/, zdroje/, dokumenty/, pracovni/, CLAUDE.md, .gitignore, .gitattributes (konce řádků LF i na Windows)
-a .claude/launch.json (náhled v Claude desktop).
+vyrezy/, zdroje/, dokumenty/, pracovni/, AGENTS.md, .gitignore, .gitattributes (LF také na Windows)
+a .codex/config.toml + .codex/agents/ (volitelné modelové role pro Codex).
 Existující data nepřepisuje.
 Aktualizace staršího projektu (znovu spustit na stejnou složku): tools/ se přepíše vždy a soubory webu,
 které se liší od nové šablony, taky – jejich staré verze se nejdřív uloží do pracovni/zaloha_web_<datum>/.
@@ -73,8 +73,11 @@ def main():
                     open(p, "wb").write(data.replace(b"\r\n", b"\n"))
     for d in ("vyrezy", "zdroje", "dokumenty", "pracovni"):
         os.makedirs(os.path.join(dst, d), exist_ok=True)
-    os.makedirs(os.path.join(dst, ".claude"), exist_ok=True)
-    for name in ("CLAUDE.md", ".gitignore", ".gitattributes", "poznamky_pro_skill.md", os.path.join(".claude", "launch.json")):
+    # Projektové nastavení Codexu: doplň pouze dosud chybějící soubory, uživatelské změny chraň.
+    codex_template = os.path.join(SKILL, "template", ".codex")
+    if os.path.isdir(codex_template):
+        copy_tree(codex_template, os.path.join(dst, ".codex"))
+    for name in ("AGENTS.md", ".gitignore", ".gitattributes", "poznamky_pro_skill.md"):
         out = os.path.join(dst, name)
         if not os.path.lexists(out):
             copy(os.path.join(SKILL, "template", name), out)

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Rodokmen z matrik"
+  short_description: "Český genealogický průvodce s ověřováním matrik a rodinným webem"
+  default_prompt: "Pomoz mi vytvořit důvěryhodný rodokmen mé rodiny. Začni otázkami na rodinné údaje, všechny nálezy ověřuj podle původních matrik a ukládej průběžně stav."
+policy:
+  allow_implicit_invocation: true

@@ -21,5 +21,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ---
-Výjimka: skills/rodokmen/reference/playbook.md není dílem autora tohoto repozitáře a licence MIT
-se na něj nevztahuje – viz poznámka na začátku toho souboru.
+Původní dokument skills/rodokmen/reference/playbook.md neměl doloženou licenci MIT. V adaptaci je v .agents/skills/rodokmen/reference/playbook.md pouze odkaz a vysvětlující poznámka; plný původní text se zde nešíří.
