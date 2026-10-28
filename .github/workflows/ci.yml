@@ -1,0 +1,33 @@
+name: Codex genealogy skill checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check Codex skill, configurations, and project generator
+        run: python3 scripts/verify_codex.py
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Create example genealogy project
+        run: python3 -I .agents/skills/rodokmen/tools/novy_projekt.py /tmp/rodokmen-ci-demo --ukazka
+      - name: Install web dependencies
+        working-directory: /tmp/rodokmen-ci-demo/web
+        run: npm ci
+      - name: Export data and build example website
+        working-directory: /tmp/rodokmen-ci-demo/web
+        run: |
+          npm run data
+          npm run build
